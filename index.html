@@ -6,18 +6,25 @@
     <title>necro.prode 2026</title>
     <style>
         :root {
-            --bg-fam: #F4D03F; --bg-part: #2ECC71;
-            --accent: #FF8C94; --white: #ffffff; --black: #000000;
+            --bg-fam: #F4D03F; 
+            --bg-part: #2ECC71;
+            --bg-pos: #FF69B4; /* Nuevo fondo rosa para posiciones */
+            --accent: #FF8C94; 
+            --white: #ffffff; 
+            --black: #000000;
             --shadow: 8px 8px 0px #000000;
         }
         body { font-family: 'Arial Black', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; transition: background 0.3s; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 25px; margin-top: 10px; }
-        .tab-btn { padding: 12px 20px; border: 4px solid var(--black); cursor: pointer; background: var(--white); box-shadow: 4px 4px 0px var(--black); text-transform: uppercase; font-size: 0.8rem; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 25px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }
+        .tab-btn { padding: 12px 20px; border: 4px solid var(--black); cursor: pointer; background: var(--white); box-shadow: 4px 4px 0px var(--black); text-transform: uppercase; font-size: 0.8rem; font-family: 'Arial Black', sans-serif; }
         .tab-btn.active { background: var(--black); color: white; transform: translate(2px, 2px); box-shadow: none; }
         .main-title { background: var(--white); border: 6px solid var(--black); padding: 10px 25px; box-shadow: var(--shadow); rotate: -1.5deg; margin-bottom: 30px; text-align: center; }
-        .search-wrapper { width: 100%; max-width: 450px; margin-bottom: 30px; }
+        
+        /* Contenedor para la búsqueda */
+        .search-section { width: 100%; max-width: 450px; display: flex; flex-direction: column; align-items: center; }
+        .search-wrapper { width: 100%; margin-bottom: 30px; }
         input { width: 100%; padding: 18px; font-size: 1.1rem; border: 5px solid var(--black); box-shadow: var(--shadow); outline: none; box-sizing: border-box; font-family: 'Arial Black', sans-serif; }
-        .result-card { background: var(--white); border: 6px solid var(--black); width: 100%; max-width: 450px; box-shadow: 15px 15px 0px var(--black); display: none; }
+        .result-card { background: var(--white); border: 6px solid var(--black); width: 100%; box-shadow: 15px 15px 0px var(--black); display: none; }
         .card-header { background: var(--black); color: var(--white); padding: 15px; font-size: 1.4rem; text-align: center; text-transform: uppercase; }
         .card-content { padding: 20px; }
         .list-title { font-size: 0.75rem; color: #555; margin-top: 15px; border-bottom: 2px solid var(--black); padding-bottom: 5px; text-transform: uppercase; font-weight: bold; }
@@ -25,7 +32,15 @@
         .item-list li { padding: 6px 0; border-bottom: 1px dashed #ccc; display: flex; justify-content: space-between; }
         .points-badge { background: var(--accent); padding: 20px; text-align: center; border-top: 6px solid var(--black); font-size: 2.2rem; }
         .data-meta { font-size: 1.1rem; margin-bottom: 10px; }
-        .flowers { font-size: 1.5rem; }
+        
+        /* Estilos de la Tabla de Posiciones */
+        .table-container { width: 100%; max-width: 600px; display: none; background: var(--white); border: 6px solid var(--black); box-shadow: 15px 15px 0px var(--black); overflow-x: auto; }
+        .pos-table { width: 100%; border-collapse: collapse; text-align: center; }
+        .pos-table th { background: #00FFFF; padding: 15px 10px; border-bottom: 6px solid var(--black); border-right: 3px solid var(--black); text-transform: uppercase; font-size: 0.9rem; }
+        .pos-table th:last-child, .pos-table td:last-child { border-right: none; }
+        .pos-table td { padding: 12px 10px; border-bottom: 3px solid var(--black); border-right: 3px solid var(--black); font-size: 0.95rem; font-family: sans-serif; font-weight: 900; }
+        .pos-table tr:last-child td { border-bottom: none; }
+        .pos-table td:nth-child(2) { text-align: left; } /* Alinea los nombres a la izquierda */
     </style>
 </head>
 <body id="bdy" style="background-color: var(--bg-fam);">
@@ -33,24 +48,42 @@
     <div class="tabs">
         <button id="tFam" class="tab-btn active" onclick="setTab('famosos')">Famosos</button>
         <button id="tPart" class="tab-btn" onclick="setTab('participantes')">Participantes</button>
+        <button id="tPos" class="tab-btn" onclick="setTab('posiciones')">Posiciones</button>
     </div>
 
     <div class="main-title">
         <h1>🌸 necro.prode 2026 🌸</h1>
     </div>
 
-    <div class="search-wrapper">
-        <input type="text" id="in" placeholder="BUSCAR FAMOSO POR NOMBRE" oninput="run()">
+    <div id="searchSection" class="search-section">
+        <div class="search-wrapper">
+            <input type="text" id="in" placeholder="BUSCAR FAMOSO POR NOMBRE" oninput="run()">
+        </div>
+
+        <div id="res" class="result-card">
+            <div id="resNom" class="card-header"></div>
+            <div class="card-content">
+                <div id="resMeta" class="data-meta"></div>
+                <div class="list-title" id="resTit"></div>
+                <ul id="resList" class="item-list"></ul>
+            </div>
+            <div id="resPts" class="points-badge"></div>
+        </div>
     </div>
 
-    <div id="res" class="result-card">
-        <div id="resNom" class="card-header"></div>
-        <div class="card-content">
-            <div id="resMeta" class="data-meta"></div>
-            <div class="list-title" id="resTit"></div>
-            <ul id="resList" class="item-list"></ul>
-        </div>
-        <div id="resPts" class="points-badge"></div>
+    <div id="posSection" class="table-container">
+        <table class="pos-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>User</th>
+                    <th>Puntuación</th>
+                    <th>Aciertos</th>
+                </tr>
+            </thead>
+            <tbody id="posBody">
+                </tbody>
+        </table>
     </div>
 
     <script>
@@ -98,14 +131,79 @@
             {n:"caro.bardelli", l:["Mirtha Legrand","Samuel Chiche Gelblung","Charly García","Luciana Salazar","Pity Álvarez","Andy Chango","Carlos Indio Solari","Karina Milei","Hugo Moyano","Esteban Bullrich","Antonella Pane","Oky","Ezequiel Lavezzi","Alberto Cormillot","Joaquín Levinton"]}
         ];
 
+        // DATOS DE POSICIONES (Extraídos de la imagen)
+        const posicionesData = [
+            {u: "moracovian", p: "41,38", a: "3"},
+            {u: "juajuajuancete", p: "27,88", a: "4"},
+            {u: "brensewer", p: "10,5", a: "1"},
+            {u: "davidsingoliath", p: "3,38", a: "2"},
+            {u: "juli.calvo", p: "3,38", a: "2"},
+            {u: "macarenapineiro", p: "3,38", a: "2"},
+            {u: "violecosmanosanchez", p: "3,38", a: "2"},
+            {u: "agusscastro_", p: "2,3", a: "1"},
+            {u: "caro.bardelli", p: "2,3", a: "1"},
+            {u: "taty_hagen", p: "2,3", a: "1"},
+            {u: "caritobruzzone", p: "1,08", a: "1"},
+            {u: "fedecouti", p: "1,08", a: "1"},
+            {u: "florenciazcs", p: "1,08", a: "1"},
+            {u: "heredialucas", p: "1,08", a: "1"},
+            {u: "mariburgue_", p: "1,08", a: "1"},
+            {u: "mateocovian", p: "1,08", a: "1"},
+            {u: "xnuriel", p: "1,08", a: "1"},
+            {u: "camilabslv", p: "0", a: "0"},
+            {u: "emiliano.sierra_", p: "0", a: "0"},
+            {u: "krysasouri", p: "0", a: "0"},
+            {u: "luciozabaldano", p: "0", a: "0"},
+            {u: "maruquinteros_", p: "0", a: "0"},
+            {u: "mau.marcon", p: "0", a: "0"},
+            {u: "natidubicki", p: "0", a: "0"},
+            {u: "sofiorlievsky", p: "0", a: "0"}
+        ];
+
+        // Llenar tabla de posiciones al cargar
+        window.onload = () => {
+            const tbody = document.getElementById('posBody');
+            tbody.innerHTML = posicionesData.map((jugador, index) => 
+                `<tr>
+                    <td>${index + 1}</td>
+                    <td>${jugador.u}</td>
+                    <td>${jugador.p}</td>
+                    <td>${jugador.a}</td>
+                </tr>`
+            ).join('');
+        };
+
         function setTab(t) {
             mode = t;
-            document.getElementById('bdy').style.backgroundColor = (t==='famosos') ? 'var(--bg-fam)' : 'var(--bg-part)';
-            document.getElementById('tFam').className = (t==='famosos') ? 'tab-btn active' : 'tab-btn';
-            document.getElementById('tPart').className = (t==='participantes') ? 'tab-btn active' : 'tab-btn';
-            document.getElementById('in').placeholder = (t==='famosos') ? 'BUSCAR FAMOSO POR NOMBRE' : 'BUSCAR PARTICIPANTE POR NOMBRE';
-            document.getElementById('res').style.display = 'none';
-            document.getElementById('in').value = '';
+            const bdy = document.getElementById('bdy');
+            const searchSec = document.getElementById('searchSection');
+            const posSec = document.getElementById('posSection');
+            const tabs = document.querySelectorAll('.tab-btn');
+            
+            tabs.forEach(btn => btn.classList.remove('active'));
+
+            if (t === 'famosos') {
+                bdy.style.backgroundColor = 'var(--bg-fam)';
+                document.getElementById('tFam').classList.add('active');
+                searchSec.style.display = 'flex';
+                posSec.style.display = 'none';
+                document.getElementById('in').placeholder = 'BUSCAR FAMOSO POR NOMBRE';
+                document.getElementById('res').style.display = 'none';
+                document.getElementById('in').value = '';
+            } else if (t === 'participantes') {
+                bdy.style.backgroundColor = 'var(--bg-part)';
+                document.getElementById('tPart').classList.add('active');
+                searchSec.style.display = 'flex';
+                posSec.style.display = 'none';
+                document.getElementById('in').placeholder = 'BUSCAR PARTICIPANTE POR NOMBRE';
+                document.getElementById('res').style.display = 'none';
+                document.getElementById('in').value = '';
+            } else if (t === 'posiciones') {
+                bdy.style.backgroundColor = 'var(--bg-pos)';
+                document.getElementById('tPos').classList.add('active');
+                searchSec.style.display = 'none';
+                posSec.style.display = 'block';
+            }
         }
 
         function run() {
@@ -121,14 +219,13 @@
                     document.getElementById('resMeta').innerHTML = `EDAD: ${f.e} AÑOS<br>PARTICIPACIONES: ${f.p}`;
                     document.getElementById('resTit').innerText = "Lo pusieron:";
                     
-                    // Cruce: buscamos qué participantes tienen a este famoso en su lista
                     const elegidaPor = part.filter(p => p.l.includes(f.n)).map(p => p.n);
                     document.getElementById('resList').innerHTML = elegidaPor.length ? elegidaPor.map(p => `<li>${p}</li>`).join('') : "<li>Nadie lo puso</li>";
                     
                     document.getElementById('resPts').innerText = `PTS: ${f.pts}`;
                     document.getElementById('resPts').style.display = 'block';
                 }
-            } else {
+            } else if (mode === 'participantes') {
                 const p = part.find(i => i.n.toLowerCase().includes(val));
                 if (p) {
                     res.style.display = 'block';
