@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
+<!DOCTYPE html><html lang="es"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>necro.prode 2026</title>
@@ -41,9 +39,7 @@
         .pos-table td { padding: 12px 10px; border-bottom: 3px solid var(--black); border-right: 3px solid var(--black); font-size: 0.95rem; font-family: sans-serif; font-weight: 900; }
         .pos-table tr:last-child td { border-bottom: none; }
         .pos-table td:nth-child(2) { text-align: left; } /* Alinea los nombres a la izquierda */
-    </style>
-</head>
-<body id="bdy" style="background-color: var(--bg-fam);">
+    </style></head><body id="bdy" style="background-color: var(--bg-fam);">
 
     <div class="tabs">
         <button id="tFam" class="tab-btn active" onclick="setTab('famosos')">Famosos</button>
@@ -82,7 +78,7 @@
                 </tr>
             </thead>
             <tbody id="posBody">
-                </tbody>
+            </tbody>
         </table>
     </div>
 
@@ -131,10 +127,10 @@
             {n:"caro.bardelli", l:["Mirtha Legrand","Samuel Chiche Gelblung","Charly García","Luciana Salazar","Pity Álvarez","Andy Chango","Carlos Indio Solari","Karina Milei","Hugo Moyano","Esteban Bullrich","Antonella Pane","Oky","Ezequiel Lavezzi","Alberto Cormillot","Joaquín Levinton"]}
         ];
 
-        // DATOS DE POSICIONES (Extraídos de la imagen)
+        // DATOS DE POSICIONES ACTUALIZADOS
         const posicionesData = [
-            {u: "moracovian", p: "41,38", a: "3"},
-            {u: "juajuajuancete", p: "27,88", a: "4"},
+            {u: "moracovian", p: "46,88", a: "4"}, // Puntuación y aciertos actualizados
+            {u: "juajuajuancete", p: "33,38", a: "5"}, // Puntuación y aciertos actualizados
             {u: "brensewer", p: "10,5", a: "1"},
             {u: "davidsingoliath", p: "3,38", a: "2"},
             {u: "juli.calvo", p: "3,38", a: "2"},
@@ -162,79 +158,100 @@
 
         // Llenar tabla de posiciones al cargar
         window.onload = () => {
-            const tbody = document.getElementById('posBody');
-            tbody.innerHTML = posicionesData.map((jugador, index) => 
-                `<tr>
+            const tbody = document.getElementById("posBody");
+            posicionesData.forEach((row, index) => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
                     <td>${index + 1}</td>
-                    <td>${jugador.u}</td>
-                    <td>${jugador.p}</td>
-                    <td>${jugador.a}</td>
-                </tr>`
-            ).join('');
+                    <td>${row.u}</td>
+                    <td>${row.p}</td>
+                    <td>${row.a}</td>
+                `;
+                tbody.appendChild(tr);
+            });
         };
 
-        function setTab(t) {
-            mode = t;
-            const bdy = document.getElementById('bdy');
-            const searchSec = document.getElementById('searchSection');
-            const posSec = document.getElementById('posSection');
-            const tabs = document.querySelectorAll('.tab-btn');
+        // Lógica de pestañas
+        function setTab(tabName) {
+            mode = tabName;
             
-            tabs.forEach(btn => btn.classList.remove('active'));
+            // Reiniciar estado visual de botones y secciones
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('searchSection').style.display = 'none';
+            document.getElementById('posSection').style.display = 'none';
+            document.getElementById('res').style.display = 'none';
+            document.getElementById('in').value = '';
 
-            if (t === 'famosos') {
-                bdy.style.backgroundColor = 'var(--bg-fam)';
+            if (tabName === 'famosos') {
                 document.getElementById('tFam').classList.add('active');
-                searchSec.style.display = 'flex';
-                posSec.style.display = 'none';
+                document.getElementById('searchSection').style.display = 'flex';
                 document.getElementById('in').placeholder = 'BUSCAR FAMOSO POR NOMBRE';
-                document.getElementById('res').style.display = 'none';
-                document.getElementById('in').value = '';
-            } else if (t === 'participantes') {
-                bdy.style.backgroundColor = 'var(--bg-part)';
+                document.body.style.backgroundColor = 'var(--bg-fam)';
+            } else if (tabName === 'participantes') {
                 document.getElementById('tPart').classList.add('active');
-                searchSec.style.display = 'flex';
-                posSec.style.display = 'none';
-                document.getElementById('in').placeholder = 'BUSCAR PARTICIPANTE POR NOMBRE';
-                document.getElementById('res').style.display = 'none';
-                document.getElementById('in').value = '';
-            } else if (t === 'posiciones') {
-                bdy.style.backgroundColor = 'var(--bg-pos)';
+                document.getElementById('searchSection').style.display = 'flex';
+                document.getElementById('in').placeholder = 'BUSCAR PARTICIPANTE POR USUARIO';
+                document.body.style.backgroundColor = 'var(--bg-part)';
+            } else if (tabName === 'posiciones') {
                 document.getElementById('tPos').classList.add('active');
-                searchSec.style.display = 'none';
-                posSec.style.display = 'block';
+                document.getElementById('posSection').style.display = 'block';
+                document.body.style.backgroundColor = 'var(--bg-pos)';
             }
         }
 
+        // Lógica de búsqueda
         function run() {
-            const val = document.getElementById('in').value.toLowerCase();
-            const res = document.getElementById('res');
-            if (val.length < 2) { res.style.display = 'none'; return; }
+            const query = document.getElementById('in').value.toLowerCase().trim();
+            if (!query) {
+                document.getElementById('res').style.display = 'none';
+                return;
+            }
+
+            let foundItem;
 
             if (mode === 'famosos') {
-                const f = famosos.find(i => i.n.toLowerCase().includes(val));
-                if (f) {
-                    res.style.display = 'block';
-                    document.getElementById('resNom').innerText = f.n;
-                    document.getElementById('resMeta').innerHTML = `EDAD: ${f.e} AÑOS<br>PARTICIPACIONES: ${f.p}`;
-                    document.getElementById('resTit').innerText = "Lo pusieron:";
+                foundItem = famosos.find(f => f.n.toLowerCase().includes(query));
+                if (foundItem) {
+                    document.getElementById('resNom').innerText = foundItem.n;
+                    document.getElementById('resMeta').innerText = `Edad: ${foundItem.e} | Puntos base: ${foundItem.pts}`;
+                    document.getElementById('resTit').innerText = 'Elegido por:';
                     
-                    const elegidaPor = part.filter(p => p.l.includes(f.n)).map(p => p.n);
-                    document.getElementById('resList').innerHTML = elegidaPor.length ? elegidaPor.map(p => `<li>${p}</li>`).join('') : "<li>Nadie lo puso</li>";
+                    const elegidosPor = part.filter(p => p.l.some(name => name.toLowerCase() === foundItem.n.toLowerCase()));
+                    let listHtml = '';
                     
-                    document.getElementById('resPts').innerText = `PTS: ${f.pts}`;
-                    document.getElementById('resPts').style.display = 'block';
+                    if (elegidosPor.length > 0) {
+                        elegidosPor.forEach(p => {
+                            listHtml += `<li><span>${p.n}</span></li>`;
+                        });
+                    } else {
+                        listHtml = '<li><span>Nadie lo eligió 😢</span></li>';
+                    }
+                    
+                    document.getElementById('resList').innerHTML = listHtml;
+                    document.getElementById('resPts').innerText = `${foundItem.p} Pick${foundItem.p > 1 ? 's' : ''}`;
+                    document.getElementById('res').style.display = 'block';
+                } else {
+                    document.getElementById('res').style.display = 'none';
                 }
             } else if (mode === 'participantes') {
-                const p = part.find(i => i.n.toLowerCase().includes(val));
-                if (p) {
-                    res.style.display = 'block';
-                    document.getElementById('resNom').innerText = p.n;
-                    document.getElementById('resMeta').innerHTML = `LISTA DE PARTICIPANTE`;
-                    document.getElementById('resTit').innerText = "Sus famosos elegidos:";
+                foundItem = part.find(p => p.n.toLowerCase().includes(query));
+                if (foundItem) {
+                    document.getElementById('resNom').innerText = foundItem.n;
+                    document.getElementById('resMeta').innerText = `Total de elecciones: ${foundItem.l.length}`;
+                    document.getElementById('resTit').innerText = 'Lista de famosos:';
                     
-                    document.getElementById('resList').innerHTML = p.l.map(nomF => `<li>${nomF}</li>`).join('');
-                    document.getElementById('resPts').style.display = 'none';
+                    let listHtml = '';
+                    [...foundItem.l].sort((a, b) => a.localeCompare(b)).forEach(f => {
+                        listHtml += `<li><span>${f}</span></li>`;
+                    });
+                    
+                    document.getElementById('resList').innerHTML = listHtml;
+                    
+                    const posInfo = posicionesData.find(pd => pd.u === foundItem.n);
+                    document.getElementById('resPts').innerText = posInfo ? `${posInfo.p} Pts | ${posInfo.a} Ac` : '-';
+                    document.getElementById('res').style.display = 'block';
+                } else {
+                    document.getElementById('res').style.display = 'none';
                 }
             }
         }
